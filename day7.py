@@ -24,28 +24,6 @@ def read_input_file(file_path):
     
     return bags_dict
 
-#Create a new dictionary so to consider the bags contained inside each inner bag
-def expand_inner_bags(bags_dict):
-    expanded_dict = bags_dict.copy()
-    #loop through the dictionary
-    for outer_bag, inner_bags in bags_dict.items():
-        expanded_inner_bags = []
-        #loop through the values (inner bags)
-        for count, color in inner_bags:
-            #if the inner bag is a key, add its content to the outer bag
-            if color in bags_dict:
-                #add first inner bag
-                expanded_inner_bags.append((count, color))
-                #loop through the values of the dictionary and fill the temporary list
-                #add nested bags
-                #modify the count following the number of nested bags
-                expanded_inner_bags.extend([(count * inner_count, inner_color) for inner_count, inner_color in bags_dict[color]])
-            else:
-                #just return the same bag if they don't contain other bags
-                expanded_inner_bags.append((count, color))
-        #Fill the dictionary with the new values
-        expanded_dict[outer_bag] = expanded_inner_bags
-    return expanded_dict
 
 #Count how many bags are inside a certain bag labeled by its color
 def resolve_inner_bags(bags_dict, bag_color):
@@ -83,8 +61,7 @@ def count_containing_shiny_gold(bags_dict):
 
 filename = "input.txt"
 bags = read_input_file(filename)
-expanded_bags = expand_inner_bags(bags)
-count = count_containing_shiny_gold(expanded_bags)
+count = count_containing_shiny_gold(bags)
 print(f'One shiny gold bag can be found inside {count} bags')
 
 result = resolve_inner_bags(bags, 'shiny gold')
