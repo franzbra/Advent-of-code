@@ -40,7 +40,7 @@ def find_direct_jolt(bag, out):
         if adapter in interval:
             fine_adapters.append([adapter,adapter-out])
     min_adapter_tuple = min(fine_adapters, key=lambda x: x[0])
-    print('the next jolt is',min_adapter_tuple[0])
+#    print('the next jolt is',min_adapter_tuple[0])
     return min_adapter_tuple[0], min_adapter_tuple[1]
 
 
@@ -63,7 +63,7 @@ while charging_outlet != built_in_adapter:
     final_adapter_list.append(join)
     charging_outlet = join
 
-print(f'There are {count_one} differences of 1 and {count_three} differences of 3')
+#print(f'There are {count_one} differences of 1 and {count_three} differences of 3')
 
 ###########################################################
 #Advent of code 2020
@@ -86,33 +86,55 @@ def total_combinations(n):
 def extract_first_elements(list_of_lists):
     return [sublist[0] for sublist in list_of_lists]
 
-#modify this function
+#modified version of previous function
 def find_direct_jolt(bag, out):
     interval = [*range(out+1, out + 4)]
     fine_adapters = []
     for adapter in bag:
         if adapter in interval:
             fine_adapters.append([adapter,adapter-out])
+#            print(adapter)
     return extract_first_elements(fine_adapters),len(fine_adapters)
 
-bag= read_input_file('prova1.txt')
+bag= read_input_file('input.txt')
 built_in_adapter = add_built_in_adapter(bag)
 bag.append(built_in_adapter)
+bag.sort()
 charging_outlet = 0
 count=1
+counter_removal=0
+pair_removal=0
+number_subset=0
+cumulative_combinations=[]
+combination_per_subset=[]
 
 while charging_outlet != built_in_adapter:
     jolts,n = find_direct_jolt(bag, charging_outlet)
-    count*= total_combinations(n)
-    print(count, jolts, n)
+    cumulative_combinations.append(total_combinations(n))
+    bag_without_set = [item for item in bag if item not in jolts]
+#    print(bag_without_set)
+#    print(f'after {charging_outlet}, I can insert {jolts}')
+#    print(f'there are {total_combinations(n)} ways to extract these numbers ')
+    counter_removal =0
+    if n>1 :
+        number_subset+=1
+       
     for i in jolts:
-        if i+3 not in bag:
-            count-=1
-        
-            
-        
-        #combination_per_subset.append(total_combinations(n))
-    charging_outlet = jolts[0]
-        
-#tot= total_combinations(math.prod(combination_per_subset))
-print(f'There are {count} way of arranging the jolts')
+        cond1= i+1
+        cond2 = i+2
+        cond3 = i+3
+        if total_combinations(n) == 1:
+            continue
+        if cond1 in bag_without_set or cond2 in bag_without_set or cond3 in bag_without_set:
+            print(f"{i} is ok, there is {cond1} or {cond2} or {cond3}")
+        else:
+#            print(f"but combinations with {i} alone can't be considered")
+            counter_removal +=1
+            if i != min(jolts):
+                counter_removal +=1
+#    print(f'so the combinations are {(total_combinations(n)-counter_removal)}')        
+    count*= (total_combinations(n)-counter_removal)
+#    print('total count:', count)
+
+    charging_outlet = max(jolts)
+print(f'There are {count-(number_subset-1)*counter_removal} way of arranging the jolts')
